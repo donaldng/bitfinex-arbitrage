@@ -40,9 +40,17 @@ def main():
     global symbol
 
     symbol = str(sys.argv[1]).upper()
+    pid = int(sys.argv[2]) if len(sys.argv) == 3 else 0    
+
     print("Start tracking...")
     while(1):
         spawn_tracker()
+        if pid:
+            try:
+                os.kill(pid, 0)
+            except:
+                sys.exit()
+                
         time.sleep(20)
         os.system("clear")
 

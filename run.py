@@ -1,9 +1,8 @@
 from pymongo import MongoClient
-from public import get_host, get_port
 import time, json, os, sys, requests, subprocess
 
-db = MongoClient(get_host(), get_port()).wtracker.trades
-# order = MongoClient(get_host(), get_port()).wtracker.orders
+db = MongoClient().wtracker.trades
+# order = MongoClient().wtracker.orders
 
 def find_process(ps_name):
     p1=subprocess.Popen(['ps','-ef'],stdout=subprocess.PIPE)
@@ -94,13 +93,12 @@ def process_result(res,price_dict):
         gap_limit = 0.5 # %
         gap = round((((res[mx] / res[mn])-1)-fees)*100, 4)
 
-        print("\nmax: %s & min: %s" % (mx,mn))
-        print("gap: %s%%" % (gap))
+        print("\ngap from %s to %s is %s%%." % (mn, mx, gap))
 
         if gap > gap_limit:
-            print("\n\nSEND ORDER")
-            print(price_dict[mx])
-            print(price_dict[mn])
+            print("\nSearch for order:")
+            print('long %s @ %s' % (mn, price_dict[mn]))
+            print('short %s @ %s' % (mx, price_dict[mx]))
             
             data = {'ts':ts, 'price': price,'amount':amount, 'pair': pair, 'base': base}
             res = db.trades.insert_one(data)
@@ -126,7 +124,13 @@ def main():
     global currency
 
     symbol = str(sys.argv[1]).upper()
-    
+
+    pid=os.fork()
+    if pid==0:
+        ppid = os.getpid()
+        os.system("nohup python3 tracker/tracker.py %s %s >/dev/null 2>&1 &" % (symbol, ppid))
+        os._exit(0)    
+
     while(1):
         process_query()
         time.sleep(1)
