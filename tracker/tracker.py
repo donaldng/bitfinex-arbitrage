@@ -17,7 +17,7 @@ def spawn_tracker():
             pid=os.fork()
             if pid==0:
                 ppid = os.getpid()
-                os.system("nohup python3 track_pair.py %s %s >/dev/null 2>&1 &" % (p, ppid))
+                os.system("nohup python3 tracker/track_pair.py %s %s >/dev/null 2>&1 &" % (p, ppid))
                 os._exit(0)
         else:
             print("%s is running..." % p)

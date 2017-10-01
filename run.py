@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import time, json, os, sys, requests, subprocess
 
 db = MongoClient().wtracker.trades
-# order = MongoClient().wtracker.orders
+order = MongoClient().wtracker.orders
 
 def find_process(ps_name):
     p1=subprocess.Popen(['ps','-ef'],stdout=subprocess.PIPE)
@@ -65,6 +65,7 @@ def process_query():
                 print("[ %s ] %s -> %s" % (pair, price, asset))
         except:
             pass
+
     process_result(result,price_dict)
 
 
@@ -99,9 +100,13 @@ def process_result(res,price_dict):
             print("\nSearch for order:")
             print('long %s @ %s' % (mn, price_dict[mn]))
             print('short %s @ %s' % (mx, price_dict[mx]))
-            
-            data = {'ts':ts, 'price': price,'amount':amount, 'pair': pair, 'base': base}
-            res = db.trades.insert_one(data)
+
+            ts = time.time()
+
+            data = {'ts':ts, 'price': price_dict[mx], 'pair': mx, 'type': 'asks'}
+            res = order.insert_one(data)
+            data = {'ts':ts, 'price': price_dict[mn], 'pair': mn, 'type': 'bids'}
+            res = order.insert_one(data)
     except:
         pass
 
