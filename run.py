@@ -2,7 +2,9 @@ from pymongo import MongoClient
 import time, json, os, sys, requests, subprocess
 
 db = MongoClient().wtracker.trades
+db.drop()
 order = MongoClient().wtracker.orders
+order.drop()
 
 def find_process(ps_name):
     p1=subprocess.Popen(['ps','-ef'],stdout=subprocess.PIPE)
@@ -103,12 +105,23 @@ def process_result(res,price_dict):
 
             ts = time.time()
 
-            data = {'ts':ts, 'price': price_dict[mx], 'pair': mx, 'type': 'asks'}
+            data = {'ts':ts, 'price': price_dict[mx], 'pair': mx, 'type': 'asks', 'base_cur': get_base_cur(mx)}
             res = order.insert_one(data)
-            data = {'ts':ts, 'price': price_dict[mn], 'pair': mn, 'type': 'bids'}
+            data = {'ts':ts, 'price': price_dict[mn], 'pair': mn, 'type': 'bids', 'base_cur': get_base_cur(mn)}
             res = order.insert_one(data)
     except:
         pass
+
+def get_base_cur(pair):
+
+    val = 1
+
+    if 'btc' in pair.lower():
+        val = btc
+    elif 'eth' in pair.lower():
+        val = eth
+
+    return val
 
 def form_pair():
     base = ['USD', 'BTC', 'ETH']
