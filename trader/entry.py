@@ -54,7 +54,6 @@ while(1):
         except:
             bfxclient = Client()
             group = {}
-            print("orderbook timed out")
             break
 
         for o in orderbook:
@@ -97,7 +96,7 @@ while(1):
             
             pair = part[0]
             price = float(part[1])
-            amount_pair[pair] = float(part[2])
+            amount_pair[pair] = float(min_usd_value[_id]/price*0.75)
             if 'btc' in pair.lower() or 'eth' in pair.lower():
                 bc = base_cur[pair]
                 amount_pair[pair] = (1/(price * bc)) * min_usd_value[_id]*0.75
@@ -107,7 +106,5 @@ while(1):
 
             elif types == "bids":
                 print("BUY %s @ %s x %s" % (pair, price, amount_pair[pair]))
-    try:
-        time.sleep(1)
-    except:
-        print("unknowned KeyboardInterrupt error on time.sleep")
+    
+    time.sleep(1)
