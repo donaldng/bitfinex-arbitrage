@@ -1,0 +1,15 @@
+# run.py
+
+gap_limit=0.5 # only look into opportunity if spread is bigger than X percentage
+fees = 0.005 # assume a fixate rate for both open and close. example 0.004 is 0.4%
+
+
+# entry.py
+
+max_usd_per_trade=1
+
+
+# bitfinex API key & secret (execute trades)
+
+key="101010101_YOUR_KEY_HERE_10101010101"
+secret="101010101_YOUR_SECRET_HERE_10101010101"

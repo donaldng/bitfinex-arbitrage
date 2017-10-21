@@ -1,20 +1,14 @@
 from pymongo import MongoClient
 from client import TradeClient, Client
 import time
-#import config
-
-#bfx = TradeClient(config.key,config.secret)
-#execute = bfx.place_order("10", "1", "buy", "market", "iotusd")
-
+import sys
+sys.path.append('../')
+import config
 
 bfxclient = Client()
 
 order = MongoClient().wtracker.orders
 lookback = 1
-
-
-def price_in_usd(pair, amount, rate):
-    return 1
 
 while(1):
 
@@ -22,8 +16,8 @@ while(1):
     cur = order.find( { 'ts' : { '$gt' : t } } )
     order.delete_many( { 'ts' : { '$lt' : t-lookback } } )
 
-    # look for most expensive in ASKS
-    # look for cheapest in BIDS
+    # look for most expensive in asks.
+    # look for cheapest in bids.
     group = {}
     disqualified = []
     count = 0
@@ -71,9 +65,7 @@ while(1):
             #print("add id %s to group with type %s and amount %s" % (_id, types, amount))
 
     # Find min amount in each group
-
     min_usd_value = {}
-    min_amount = {}
 
     for _id, y in group.items():
         for types, details in y.items():
@@ -85,7 +77,9 @@ while(1):
 
             if _id not in min_usd_value or usd_value < min_usd_value[_id]:
                 min_usd_value[_id] = usd_value
-                min_amount[_id] = amount
+
+                if usd_value > config.max_usd_per_trade:
+                    min_usd_value[_id] = config.max_usd_per_trade
 
 
     # Execute trade in each group with min amount
@@ -96,15 +90,20 @@ while(1):
             
             pair = part[0]
             price = float(part[1])
-            amount_pair[pair] = float(min_usd_value[_id]/price*0.75)
+            amount_pair[pair] = float(min_usd_value[_id]/price*0.8)
             if 'btc' in pair.lower() or 'eth' in pair.lower():
                 bc = base_cur[pair]
-                amount_pair[pair] = (1/(price * bc)) * min_usd_value[_id]*0.75
+                amount_pair[pair] = (1/(price * bc)) * min_usd_value[_id]*0.8
 
             if types == "asks":
                 print("SELL %s @ %s x %s" % (pair, price, amount_pair[pair]))
+                bfx = TradeClient(config.key,config.secret)
+                execute = bfx.place_order(amount_pair[pair], "1", "sell", "market", pair)
 
             elif types == "bids":
                 print("BUY %s @ %s x %s" % (pair, price, amount_pair[pair]))
+                bfx = TradeClient(config.key,config.secret)
+                execute = bfx.place_order(amount_pair[pair], "1", "buy", "market", pair)
+
     
     time.sleep(1)

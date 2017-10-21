@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-import time, json, os, sys, requests, subprocess
+import time, json, os, sys, requests, subprocess, config
 
 db = MongoClient().wtracker.trades
 db.drop()
@@ -26,8 +26,6 @@ def process_query():
     print("\n[ Arbitrage ]\n")
 
     usd = 1000
-    fees = 0.0 #0.005
-
     result = {}
     price_dict = {}
 
@@ -92,9 +90,8 @@ def process_result(res,price_dict):
     try:
         mx=max(res, key=res.get)
         mn=min(res, key=res.get)
-        fees = 0.005 # 0.004 = 0.4%
-        gap_limit = 0.5 # %
-        gap = round((((res[mx] / res[mn])-1)-fees)*100, 4)
+        gap_limit = config.gap_limit # %
+        gap = round((((res[mx] / res[mn])-1)-config.fees)*100, 4)
 
         print("\ngap from %s to %s is %s%%." % (mn, mx, gap))
 
