@@ -8,9 +8,21 @@ import config
 bfxclient = Client()
 
 order = MongoClient().wtracker.orders
+no_active_trade = MongoClient().wtracker.trade
 lookback = 1
 
+def get_active_positions():
+    bfx = TradeClient(config.key,config.secret)
+    return bfx.active_positions()
+
+
 while(1):
+
+    active_positions = get_active_positions()
+
+    if active_positions:
+       time.sleep(600)
+       continue
 
     t = int(time.time())-lookback
     cur = order.find( { 'ts' : { '$gt' : t } } )
