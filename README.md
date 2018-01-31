@@ -6,7 +6,7 @@ Currently it can only tracks for arbitrage opportunity. Automated trading on arb
 
 ## Disclaimer
 
-This is just an experimental/POC arbitrage bot, please use it with your own risk.
+This is just an experimental/POC arbitrage bot, please use it on your own risk.
 
 ### How to use
 
@@ -33,9 +33,9 @@ $ cp config.py.sample config.py
 $ vi config.py
 ```
 
-### Todos
-Auto trading is currenly under development, features to be implement as below:
-  - Exit mechanism (WIP - current version is unstable, please avoid running with deep staked account)
+### Risk
+
+Current version of exit strategy is unstable, and not tested yet, please avoid running with deeply staked account, and only use if you know what you're/the code are doing!
 
 License
 ----
