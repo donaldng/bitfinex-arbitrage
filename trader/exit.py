@@ -14,9 +14,7 @@ def get_active_positions():
     bfx = TradeClient(config.key,config.secret)
     return bfx.active_positions()
 
-
 while(1):
-
     active_positions = get_active_positions()
 
     if not active_positions:
